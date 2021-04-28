@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# coding:utf-8
+# transpose data matrix (swap rows and columns)
+#
+
+import sys
+import argparse
+
+parser = argparse.ArgumentParser(
+description="""
+sum by columns""",
+epilog="""
+With no FILE, or when FILE is -, read standard input.
+
+Examples:
+  csum -c 1 f   sum by column 1 in f file
+  csum          sum standard input to standard output.
+
+Report bugs to luyulinvip@outlook.com
+""",
+formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("file", nargs="?")
+parser.add_argument("-c", "--col", type=int, default=1, help="column [1]")
+parser.add_argument("-k", "--skiprows", type=int, default=0, help="skip rows [0]")
+args = parser.parse_args()
+
+
+data = []
+ntype = "int"
+
+col = args.col - 1
+row = 0
+inf = sys.stdin if args.file is None or args.file == "-" else open(args.file, "r")
+for line in inf:
+    row += 1
+    if row <= args.skiprows:
+        continue
+    value = line.strip("\n").split("\t")[col].strip()
+    if "." in value:
+        ntype = "float"
+    try:
+        value = float(value)
+        data.append(value)
+    except ValueError:
+        continue
+inf.close()
+
+s = sum(data)
+if ntype == "int":
+    s = int(s)
+print(s)
+
