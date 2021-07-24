@@ -24,7 +24,30 @@ csum -c 4 -k 3 test/student_record.txt
 tail -2 test/student_record.txt | csum -c 3
 ```
 
+`fa-rec`: 返回fasta序列的反向互补序列
 
+```shell
+# 示例1:
+fa-rec test/seq.fa
+# 示例2:
+cat test/seq.fa | fa-rec
+```
 
+`fa-fmt`: 将fasta格式化输出(每行N个碱基(默认60))
 
+```
+# 示例1:
+fa-fmt -n 40 test/seq.fa
+# 示例2:
+cat test/seq.fa | fa-fmt
+```
+
+`fa-upper`: 大写fasta碱基序列
+
+```
+# 示例1:
+fa-upper test/seq.fa
+# 示例2:
+cat test/seq.fa | fa-upper
+```
 

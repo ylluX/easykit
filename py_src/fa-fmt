@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+# coding:utf-8
+# Format sequences so that each line has N bases
+#
+
+import sys
+import argparse
+
+parser = argparse.ArgumentParser(
+description="""
+Format fasta sequences so that each line has N bases""",
+epilog="""
+With no FILE, or when FILE is -, read standard input.
+
+Examples:
+  fa-fmt f          format f file
+  fa-fmt            format standard input to standard output.
+  fa-fmt -n 30 f    each line has 30 base.
+
+Report bugs to luyulinvip@outlook.com
+""",
+formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("file", nargs="?")
+parser.add_argument("-n", type=int, default=60, help="base num [60]")
+args = parser.parse_args()
+
+if args.n <= 0:
+    print("Error: The parameter `n` must be greater than 0.")
+    exit()
+
+def tprint(n):
+    x = 0
+    def xprint(seq, br=False):
+        nonlocal x
+        slen = len(seq)
+        y = n - x
+        if y <= slen:
+            print(seq[:y])
+            a = (slen - y) // n
+            b = (slen - y) % n
+            t = y
+            for i in range(a):
+                print(seq[t:t+n])
+                t += n
+            if b:
+                print(seq[t:], end="")
+                if br:
+                    print()
+            x = b
+        else:
+            print(seq, end="")
+            if br:
+                print()
+            x += slen
+        return x
+    return xprint
+
+
+inf = sys.stdin if args.file is None or args.file == "-" else open(args.file, "r")
+temp = ""
+head = False
+pp = tprint(args.n)
+n = 0
+while 1:
+    lines = inf.read(2048)
+    if lines == "":
+        break
+    lines = lines.split("\n")
+    ln = len(lines)
+    for i, line in enumerate(lines):
+        if line and line[0] == ">":
+            if n:
+                print()
+            if i != ln - 1:
+                print(line)
+                pp = tprint(args.n)
+            else:
+                print(line, end="")
+                head = True
+        else:
+            if head:
+                if ln == 1:
+                    print(line, end="")
+                else:
+                    print(line)
+                    pp = tprint(args.n)
+                    head = False
+            else:
+                n = pp(line)
+print()
+inf.close()
+

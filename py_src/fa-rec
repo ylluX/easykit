@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+# coding:utf-8
+# get reverse complementary sequences
+#
+
+import sys
+import argparse
+
+parser = argparse.ArgumentParser(
+description="""
+Get reverse complementary fasta sequences""",
+epilog="""
+With no FILE, or when FILE is -, read standard input.
+
+Examples:
+  fa-rec f      reverse complement f file
+  fa-rec        reverse complement standard input to standard output.
+
+Report bugs to luyulinvip@outlook.com
+""",
+formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("file", nargs="?")
+args = parser.parse_args()
+
+tab = {"A":"T", "T":"A", "C":"G", "G":"C", "U":"A", " ":" ",
+       "a":"T", "t":"A", "c":"G", "g":"C", "u":"A"}
+
+inf = sys.stdin if args.file is None or args.file == "-" else open(args.file, "r")
+for line in inf:
+    if line[0] == ">":
+        print(line.strip())
+        continue
+    seq = []
+    for i in line.strip()[::-1]:
+        seq.append(tab.get(i, "N"))
+    print("".join(seq))
+inf.close()
+
