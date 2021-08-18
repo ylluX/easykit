@@ -28,6 +28,15 @@ if args.n <= 0:
     print("Error: The parameter `n` must be greater than 0.")
     exit()
 
+
+builtin_print = print
+def print(*args, **kwargs):
+    try:
+        builtin_print(*args, **kwargs)
+    except (BrokenPipeError, IOError):
+        exit()
+
+
 def tprint(n):
     x = 0
     def xprint(seq, br=False):

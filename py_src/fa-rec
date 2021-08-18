@@ -25,14 +25,45 @@ args = parser.parse_args()
 tab = {"A":"T", "T":"A", "C":"G", "G":"C", "U":"A", " ":" ",
        "a":"T", "t":"A", "c":"G", "g":"C", "u":"A"}
 
-inf = sys.stdin if args.file is None or args.file == "-" else open(args.file, "r")
-for line in inf:
-    if line[0] == ">":
-        print(line.strip())
-        continue
-    seq = []
-    for i in line.strip()[::-1]:
-        seq.append(tab.get(i, "N"))
-    print("".join(seq))
-inf.close()
 
+builtin_print = print
+def print(*args, **kwargs):
+    try:
+        builtin_print(*args, **kwargs)
+    except (BrokenPipeError, IOError):
+        exit()
+
+
+def rev_print(seqs, single_line_base_num=60):
+    count = 0
+    temp = ''
+    for seq in seqs[::-1]:
+        for i in seq[::-1]:
+            temp += tab.get(i, 'N')
+            count += 1
+            if count >= single_line_base_num:
+                print(temp)
+                count = 0
+                temp = ''
+    if temp:
+        print(temp)
+
+
+inf = sys.stdin if args.file is None or args.file == "-" else open(args.file, "r")
+single_line_base_num = 0
+seqs = []
+for line in inf:
+    line = line.strip()
+    if line[0] == ">":
+        print(line)
+        if seqs:
+            rev_print(seqs, single_line_base_num)
+            single_line_base_num = 0
+            seqs = []
+        continue
+    if single_line_base_num == 0:
+        single_line_base_num = len(line)
+    seqs.append(line)
+if seqs:
+    rev_print(seqs, single_line_base_num)
+inf.close()
